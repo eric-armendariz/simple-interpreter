@@ -63,6 +63,23 @@ type InfixExpression struct {
 	Right    Expression
 }
 
+type Boolean struct {
+	Token token.Token
+	Value bool
+}
+
+type IfExpression struct {
+	Token       token.Token
+	Condition   Expression
+	Consequence *BlockStatement
+	Alternative *BlockStatement
+}
+
+type BlockStatement struct {
+	Token      token.Token
+	Statements []Statement
+}
+
 func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
 
 func (ls *LetStatement) statementNode() {}
@@ -163,3 +180,35 @@ func (infix *InfixExpression) String() string {
 
 func (infix *InfixExpression) TokenLiteral() string { return infix.Token.Literal }
 func (infix *InfixExpression) expressionNode()      {}
+
+func (b *Boolean) String() string       { return b.Token.Literal }
+func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
+func (b *Boolean) expressionNode()      {}
+
+func (ifExp *IfExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("if")
+	out.WriteString(ifExp.Condition.String())
+	out.WriteString(" ")
+	out.WriteString(ifExp.Consequence.String())
+
+	if ifExp.Alternative != nil {
+		out.WriteString("else ")
+		out.WriteString(ifExp.Alternative.String())
+	}
+	return out.String()
+}
+func (ifExp *IfExpression) TokenLiteral() string { return ifExp.Token.Literal }
+func (ifExp *IfExpression) expressionNode()      {}
+
+func (bs *BlockStatement) String() string {
+	var out bytes.Buffer
+
+	for _, s := range bs.Statements {
+		out.WriteString(s.String())
+	}
+	return out.String()
+}
+func (bs *BlockStatement) TokenLiteral() string { return bs.Token.Literal }
+func (bs *BlockStatement) expressionNode()      {}
