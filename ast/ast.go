@@ -103,6 +103,12 @@ type ArrayLiteral struct {
 	Elements []Expression
 }
 
+type IndexExpression struct {
+	Token token.Token
+	Left  Expression
+	Index Expression
+}
+
 func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
 
 func (ls *LetStatement) statementNode() {}
@@ -293,3 +299,17 @@ func (al *ArrayLiteral) String() string {
 }
 func (al *ArrayLiteral) TokenLiteral() string { return al.Token.Literal }
 func (al *ArrayLiteral) expressionNode()      {}
+
+func (ie *IndexExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(ie.Left.String())
+	out.WriteString("[")
+	out.WriteString(ie.Index.String())
+	out.WriteString("])")
+
+	return out.String()
+}
+func (ie *IndexExpression) TokenLiteral() string { return ie.Token.Literal }
+func (ie *IndexExpression) expressionNode()      {}
