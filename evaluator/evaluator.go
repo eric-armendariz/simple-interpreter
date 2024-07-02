@@ -71,6 +71,24 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return args[0]
 		}
 		return applyFunction(function, args)
+	case *ast.ArrayLiteral:
+		elems := evalExpressions(node.Elements, env)
+		if len(elems) == 1 && isError(elems[0]) {
+			return elems[0]
+		}
+		return &object.Array{Elements: elems}
+	case *ast.IndexExpression:
+		left := Eval(node.Left, env)
+		if isError(left) {
+			return left
+		}
+
+		index := Eval(node.Index, env)
+		if isError(index) {
+			return index
+		}
+
+		return evalIndexExpression(left, index)
 	}
 	return nil
 }
@@ -255,6 +273,16 @@ func evalExpressions(args []ast.Expression, env *object.Environment) []object.Ob
 		result = append(result, evalExp)
 	}
 	return result
+}
+
+func evalIndexExpression(left object.Object, index object.Object) object.Object {
+	array := left.(*object.Array)
+	idx := index.(*object.Integer).Value
+
+	if idx < 0 || idx >= int64(len(array.Elements)) {
+		return NULL
+	}
+	return array.Elements[idx]
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {

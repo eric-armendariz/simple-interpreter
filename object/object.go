@@ -25,6 +25,7 @@ const (
 	ERROR_OBJ        = "ERROR"
 	FUNCTION_OBJ     = "FUNCTION"
 	BUILTIN_OBJ      = "BUILTIN"
+	ARRAY_OBJ        = "ARRAY"
 )
 
 type Integer struct {
@@ -57,6 +58,10 @@ type Error struct {
 
 type Builtin struct {
 	Fn BuiltinFunction
+}
+
+type Array struct {
+	Elements []Object
 }
 
 func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
@@ -98,3 +103,19 @@ func (f *Function) Type() ObjectType { return FUNCTION_OBJ }
 
 func (bf *Builtin) Inspect() string  { return "builtin function" }
 func (bf *Builtin) Type() ObjectType { return BUILTIN_OBJ }
+
+func (ao *Array) Inspect() string {
+	var out bytes.Buffer
+
+	elements := []string{}
+	for _, e := range ao.Elements {
+		elements = append(elements, e.Inspect())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+
+	return out.String()
+}
+func (ao *Array) Type() ObjectType { return ARRAY_OBJ }
